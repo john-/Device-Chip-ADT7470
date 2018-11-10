@@ -6,6 +6,4 @@ How is the max_bitrate determined?   I don't see it in data sheet
 
 Check rpm reading logic as I should consider Register 0x43 (fan pulses per revolution register)
 
-Check rpm reading logic in conditions like fan is disconnected (shows 82 rpm currently)
-
 Error handling when device is not available (powered down)

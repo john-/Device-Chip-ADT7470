@@ -257,8 +257,14 @@ sub read_fan_rpm {
 
             my ($highbyte) = unpack "C", $result;
 
-            Future->done(
-                int( ( 90000 * 60 ) / ( $highbyte * 256 + $lowbyte ) ) );
+            my $rpm;
+	    if  ( not (($highbyte == 0xFF) and ($lowbyte == 0xFF)) ) {
+                $rpm = int((90000*60)/($highbyte*256+$lowbyte));
+	    } else { # fan is stalled
+                $rpm = 0;
+	    }
+
+            Future->done($rpm);
         }
     );
 
