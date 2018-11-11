@@ -108,7 +108,8 @@ use constant {
     REG_CONFIG1   => 0x40,    # R/W
 };
 
-bitfield { format => "bytes-BE" }, CONFIG1 => STRT => boolfield(0),
+bitfield { format => "bytes-BE" }, CONFIG1 =>
+  STRT      => boolfield(0),
   RESERVED1 => boolfield(1),
   RESERVED2 => boolfield(2),
   TODIS     => boolfield(3),
