@@ -259,7 +259,7 @@ sub read_fan_rpm {
             my ($highbyte) = unpack "C", $result;
 
             my $rpm = 0;
-            if  ( not (($highbyte == 0xFF) and ($lowbyte == 0xFF)) ) {
+            if  ( ($highbyte != 0xFF) || ($lowbyte != 0xFF) ) {
                 $rpm = int((90000*60)/($highbyte*256+$lowbyte));
             }
 
