@@ -33,7 +33,14 @@ METHODS
   read_config
        $config = $chip->read_config->get
 
-    Reads and returns the current chip configuration as a "HASH" reference.
+    Returns a "HASH" reference of the contents of the user register.
+
+       STRT    => 0 | 1
+       TODIS   => 0 | 1
+       LOCK    => 0 | 1  (power cycle to unlock)
+       FST_TCH => 0 | 1
+       HF_LF   => 0 | 1
+       T05_STB => 0 | 1
 
   change_config
        $chip->change_config( %config )->get
