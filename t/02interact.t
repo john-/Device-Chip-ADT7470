@@ -73,7 +73,7 @@ $chip->mount(
 # ->read_fan_rpm
 {
     $adapter->expect_write_then_read( "\x2A", 2 )
-      ->returns( "\xFFFF" );
+      ->returns( "\xFF\xFF" );
 
    is( $chip->read_fan_rpm(1)->get, 0,
       '->read_fan_rpm result (fan stalled)' );
