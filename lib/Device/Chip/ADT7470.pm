@@ -79,10 +79,22 @@ L<Future> instances.
 
 use constant {
     REG_TACH => {
-        FAN1 => 0x2A,
-        FAN2 => 0x2C,
-        FAN3 => 0x2E,
-        FAN4 => 0x30,
+	FAN1 => {
+	    LOWBYTE  => 0x2A,
+	    HIGHBYTE => 0x2B
+	},
+	FAN2 => {
+	    LOWBYTE  => 0x2C,
+	    HIGHBYTE => 0x2D
+	},
+	FAN3 => {
+	    LOWBYTE  => 0x2E,
+	    HIGHBYTE => 0x2F
+	},
+	FAN4 => {
+	    LOWBYTE  => 0x30,
+	    HIGHBYTE => 0x31
+	}
     },
     REG_DUTY => {
         FAN1 => 0x32,
@@ -242,19 +254,22 @@ sub read_fan_rpm {
 
     $fan = $self->_format_fan($fan);
 
-    $self->read_reg( REG_TACH->{$fan}, 2 )->then(
-        sub {
-            my ($result) = unpack "S<", $_[0];
+    $self->read_reg( REG_TACH->{$fan}->{LOWBYTE}, 1 )->then(
+	sub {
+	    my ($lowbyte) = unpack "C", $_[0];
 
-	    print sprintf("got: %x\n", $result);
+	    my $result =
+		$self->read_reg( REG_TACH->{$fan}->{HIGHBYTE}, 1 )->get;
 
-            my $rpm = 0;
-            if ($result != 0xFFFF) {
-                $rpm = int((90000*60)/($result));
-            }
+	    my ($highbyte) = unpack "C", $result;
 
-            Future->done($rpm);
-        }
+	    my $rpm = 0;
+	    if ($highbyte != 0xFF || $lowbyte != 0xFF) {
+		$rpm = int((90000*60)/($highbyte*256+$lowbyte));
+	    }
+
+	    Future->done($rpm);
+	}
     );
 
 }
