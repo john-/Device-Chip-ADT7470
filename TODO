@@ -1,4 +1,6 @@
-read_fan_rpm:  I am not chaining the future call to include reading the HIGHBYTE.  Seems odd to pass the return values down the chain.   Determine if there is a better way to do this.
+read_fan_rpm:  I am not chaining the future call to include reading the HIGHBYTE.  Seems odd to pass the return values down the chain.   Determine if there is a better way to do this.  Update:  I attempted to do this one call.  However, page 23 of the data sheet probably explains why I could not get it to work:  Measuring fan speed involves a 2-register read for each measurement. The low byte should be read first. This causes the high byte to be frozen until both high and low byte registers are read from, preventing erroneous tach readings. 
+
+Maybe there is a way of cleanly chaining the 2 reads vs. the non-blocking the second byte read.
 
 Check rpm reading logic as I should consider Register 0x43 (fan pulses per revolution register)
 
