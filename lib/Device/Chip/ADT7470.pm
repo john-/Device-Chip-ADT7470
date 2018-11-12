@@ -19,6 +19,8 @@ our $VERSION = '0.01';
 use Carp;
 use Data::Bitfield qw( bitfield boolfield );
 
+use constant { STALLED => 0xFFFF };
+
 =encoding UTF-8
 
 =head1 NAME
@@ -254,19 +256,14 @@ sub read_fan_rpm {
 
     $fan = $self->_format_fan($fan);
 
-    $self->read_reg( REG_TACH->{$fan}->{LOWBYTE}, 1 )->then(
-	sub {
-	    my ($lowbyte) = unpack "C", $_[0];
+    Future->needs_all(
+	$self->read_reg( REG_TACH->{$fan}->{LOWBYTE}, 1 ),
+	$self->read_reg( REG_TACH->{$fan}->{HIGHBYTE}, 1 ),
+	)->then( sub {
+	    my ( $lo, $hi ) = @_;
+	    my $result = unpack "S<", $lo . $hi;
 
-	    my $result =
-		$self->read_reg( REG_TACH->{$fan}->{HIGHBYTE}, 1 )->get;
-
-	    my ($highbyte) = unpack "C", $result;
-
-	    my $rpm = 0;
-	    if ($highbyte != 0xFF || $lowbyte != 0xFF) {
-		$rpm = int((90000*60)/($highbyte*256+$lowbyte));
-	    }
+	    my $rpm = ($result != STALLED) ? int((90000*60)/$result) : 0;
 
 	    Future->done($rpm);
 	}
