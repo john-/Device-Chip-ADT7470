@@ -1,8 +1,4 @@
-Confirm that the write functions shold not return anything
-
 read_fan_rpm:  I am not chaining the future call to include reading the HIGHBYTE.  Seems odd to pass the return values down the chain.   Determine if there is a better way to do this.
-
-How is the max_bitrate determined?   I don't see it in data sheet
 
 Check rpm reading logic as I should consider Register 0x43 (fan pulses per revolution register)
 

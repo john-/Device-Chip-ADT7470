@@ -61,10 +61,8 @@ $chip->mount(
 
 # ->read_fan_rpm
 {
-    $adapter->expect_write_then_read( "\x2A", 1 )
-      ->returns( "\xFF" );	
-    $adapter->expect_write_then_read( "\x2B", 1 )
-      ->returns( "\x17" );
+    $adapter->expect_write_then_read( "\x2A", 2 )
+      ->returns( "\xFF\x17" );
 
    is( $chip->read_fan_rpm(1)->get, 879,
       '->read_fan_rpm result' );
@@ -74,10 +72,8 @@ $chip->mount(
 
 # ->read_fan_rpm
 {
-    $adapter->expect_write_then_read( "\x2A", 1 )
-      ->returns( "\xFF" );	
-    $adapter->expect_write_then_read( "\x2B", 1 )
-      ->returns( "\xFF" );
+    $adapter->expect_write_then_read( "\x2A", 2 )
+      ->returns( "\xFFFF" );
 
    is( $chip->read_fan_rpm(1)->get, 0,
       '->read_fan_rpm result (fan stalled)' );

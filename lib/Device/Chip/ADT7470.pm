@@ -66,7 +66,7 @@ sub I2C_options {
     return (
         %params,    # this needs to fixed with resolution of 127570
         addr        => $addr,
-        max_bitrate => 100E3,    # TODO:  check if this is from datasheet
+        max_bitrate => 400E3,
     );
 }
 
@@ -79,22 +79,10 @@ L<Future> instances.
 
 use constant {
     REG_TACH => {
-        FAN1 => {
-            LOWBYTE  => 0x2A,
-            HIGHBYTE => 0x2B
-        },
-        FAN2 => {
-            LOWBYTE  => 0x2C,
-            HIGHBYTE => 0x2D
-        },
-        FAN3 => {
-            LOWBYTE  => 0x2E,
-            HIGHBYTE => 0x2F
-        },
-        FAN4 => {
-            LOWBYTE  => 0x30,
-            HIGHBYTE => 0x31
-        }
+        FAN1 => 0x2A,
+        FAN2 => 0x2C,
+        FAN3 => 0x2E,
+        FAN4 => 0x30,
     },
     REG_DUTY => {
         FAN1 => 0x32,
@@ -110,8 +98,6 @@ use constant {
 
 bitfield { format => "bytes-BE" }, CONFIG1 =>
   STRT      => boolfield(0),
-  RESERVED1 => boolfield(1),
-  RESERVED2 => boolfield(2),
   TODIS     => boolfield(3),
   LOCK      => boolfield(4),
   FST_TCH   => boolfield(5),
@@ -122,7 +108,14 @@ bitfield { format => "bytes-BE" }, CONFIG1 =>
 
    $config = $chip->read_config->get
 
-Reads and returns the current chip configuration as a C<HASH> reference.
+Returns a C<HASH> reference of the contents of the user register.
+
+   STRT    => 0 | 1
+   TODIS   => 0 | 1
+   LOCK    => 0 | 1  (power cycle to unlock)
+   FST_TCH => 0 | 1
+   HF_LF   => 0 | 1
+   T05_STB => 0 | 1
 
 =cut
 
@@ -249,18 +242,15 @@ sub read_fan_rpm {
 
     $fan = $self->_format_fan($fan);
 
-    $self->read_reg( REG_TACH->{$fan}->{LOWBYTE}, 1 )->then(
+    $self->read_reg( REG_TACH->{$fan}, 2 )->then(
         sub {
-            my ($lowbyte) = unpack "C", $_[0];
+            my ($result) = unpack "S<", $_[0];
 
-            my $result =
-              $self->read_reg( REG_TACH->{$fan}->{HIGHBYTE}, 1 )->get;
-
-            my ($highbyte) = unpack "C", $result;
+	    print sprintf("got: %x\n", $result);
 
             my $rpm = 0;
-            if ($highbyte != 0xFF || $lowbyte != 0xFF) {
-                $rpm = int((90000*60)/($highbyte*256+$lowbyte));
+            if ($result != 0xFFFF) {
+                $rpm = int((90000*60)/($result));
             }
 
             Future->done($rpm);

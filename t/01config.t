@@ -22,8 +22,6 @@ $chip->mount(
     is_deeply( $chip->read_config->get,
        {
 	  STRT       => 1,
-	  RESERVED1  => '',
-	  RESERVED2  => '',
 	  TODIS      => '',
 	  LOCK       => '',
 	  FST_TCH    => '',
