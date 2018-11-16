@@ -1,5 +1,8 @@
 Revision history for Device-Chip-ADT7470
 
+0.02    2018/11/15
+        Added test cases and change to build.
+
 0.01    2018/11/10
         First version.
 
