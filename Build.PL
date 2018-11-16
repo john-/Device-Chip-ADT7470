@@ -6,7 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
     module_name => 'Device::Chip::ADT7470',
     requires    => {
-        'Data::Bitfield'                    => 0,
+        'Data::Bitfield'                    => '0.02',
         'Device::Chip'                      => '0.04',
 	'Device::Chip::Base::RegisteredI2C' => '0.10',
 	'Carp'                              => 0,
